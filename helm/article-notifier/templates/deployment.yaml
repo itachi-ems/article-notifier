@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: article-notifier
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: article-notifier
+  template:
+    metadata:
+      labels:
+        app: article-notifier
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: harshshah98/myloft-article
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          env: 
+            # - name: PORT
+            #   value: '3000'
+            # - name: MONGODB_URI
+            #   value: mongodb://root:password123@article-notifier-mongodb-headless:27017/
+            - name: MONGODB_HOST
+              value: mongodb://article-notifier-mongodb-headless.default.svc.cluster.local:27017/
+              #value: article-notifier-mongodb-headless.default.svc.cluster.local:27017
+
+              #mongodb://userone:password123@127.0.0.1:27017/?authSource=demo&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
+            - name: MONGODB_DB
+              value: admin
+            - name: RABBIT_MQ_URI
+              value: amqp://user1:password123@article-notifier-rabbitmq:5672
+      
